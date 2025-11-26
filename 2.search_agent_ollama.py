@@ -4,7 +4,7 @@ load_dotenv()
 from langchain.agents import create_agent
 from langchain.tools import tool
 from langchain_core.messages import HumanMessage
-from langchain_openai import ChatOpenAI
+from langchain_ollama import ChatOllama  # Use Ollama for local LLM
 from tavily import TavilyClient
 from langchain_tavily import TavilySearch
 from typing import List
@@ -21,21 +21,21 @@ class AgentResponse(BaseModel):
     answer: str = Field(description="The agent's answer to the user's question")
     sources: List[Source] = Field(default_factory=list, description="The sources used by the agent to answer the question")
 
-# @tool
-# def search(query: str) -> str:
-#     """
-#     Search the web for information about the query.
-#     Args:
-#         query: The query to search for.
-#     Returns:
-#         The search results.
-#     """
-#     print(f"Searching for {query}")
-#     return tavily.search(query)
-    
-llm = ChatOpenAI(model="gpt-5")
-# tools = [search]
-tools = [TavilySearch()]
+@tool
+def search(query: str) -> str:
+    """
+    Search the web for information about the query.
+    Args:
+        query: The query to search for.
+    Returns:
+        The search results.
+    """
+    print(f"Searching for {query}")
+    return tavily.search(query)
+
+llm = ChatOllama(model="llama3.2:3b", temperature=0)  # Local model via Ollama
+tools = [search]
+# tools = [TavilySearch()]
 agent = create_agent(model=llm, tools=tools, response_format=AgentResponse)
 
 def main():
