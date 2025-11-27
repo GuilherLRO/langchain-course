@@ -43,7 +43,8 @@ agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
 def main():
     print("Hello from langchain-course!")
-    result = agent_executor.invoke({"input": "Search for 3 job postings for ai engineer on linkedin from us or europe that allow international hires from brazil"})
+    #result = agent_executor.invoke({"input": "Search for 3 job postings for ai engineer on linkedin from us or europe that allow international hires from brazil"})
+    result = agent_executor.invoke({"input": "What are the latest and most relevant news on the Data Analystics as Artificial Intelligence? I also want links to the articles"})
     print(result)
     
 if __name__ == "__main__":
