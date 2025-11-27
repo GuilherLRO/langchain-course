@@ -1,17 +1,18 @@
-
 import os
 from dotenv import load_dotenv
 
-from langchain_classic.agents import create_react_agent,AgentExecutor
+from langchain_classic.agents import create_react_agent, AgentExecutor
 from langchain_openai import ChatOpenAI
 from langchain_tavily import TavilySearch
 from langchain_core.prompts import PromptTemplate
+
 load_dotenv()
 
 
 tools = [TavilySearch()]
 llm = ChatOpenAI(model="gpt-4o")
 from langchain_core.prompts import PromptTemplate
+
 react_prompt = PromptTemplate.from_template(
     """Answer the following questions as best you can. You have access to the following tools:
 
@@ -43,11 +44,17 @@ agent = create_react_agent(
 
 agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
+
 def main():
-    print("Hello from langchain-course!") 
-    #result = agent_executor.invoke({"input": "Search for 3 job postings for ai engineer on linkedin from us or europe that allow international hires from brazil"})
-    result = agent_executor.invoke({"input": "What are the latest and most relevant news on the Data Analystics as Artificial Intelligence? I also want links to the articles"})
+    print("Hello from langchain-course!")
+    # result = agent_executor.invoke({"input": "Search for 3 job postings for ai engineer on linkedin from us or europe that allow international hires from brazil"})
+    result = agent_executor.invoke(
+        {
+            "input": "What are the latest and most relevant news on the Data Analystics as Artificial Intelligence? I also want links to the articles"
+        }
+    )
     print(result)
-    
+
+
 if __name__ == "__main__":
     main()

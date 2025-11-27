@@ -6,6 +6,7 @@ import os
 
 load_dotenv()
 
+
 def main():
     print("Hello from langchain-course!")
     information = (
@@ -22,11 +23,12 @@ def main():
     """
 
     summary_prompt_template = ChatPromptTemplate.from_template(summary_template)
-    #llm = ChatOpenAI(model="gpt-5", temperature=1)
+    # llm = ChatOpenAI(model="gpt-5", temperature=1)
     llm = ChatOllama(model="gemma3:270m", temperature=0)
-    chain = summary_prompt_template | llm #runnable chain
+    chain = summary_prompt_template | llm  # runnable chain
     summary = chain.invoke({"information": information})
     print(summary.content)
+
 
 if __name__ == "__main__":
     main()

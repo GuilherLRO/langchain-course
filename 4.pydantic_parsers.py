@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+
 load_dotenv()
 
 from typing import List
@@ -15,8 +16,10 @@ from langchain_core.runnables import RunnableLambda
 set_debug(True)
 # ---------- Pydantic schema ----------
 
+
 class Source(BaseModel):
     url: str = Field(description="URL of a source used to answer the question")
+
 
 class AgentResponse(BaseModel):
     answer: str = Field(description="Natural language answer to the user's question")
@@ -57,9 +60,7 @@ chain = agent_executor | RunnableLambda(lambda x: x["messages"][-1].content) | p
 if __name__ == "__main__":
     print("Hello from langchain-course!")
 
-    question = (
-        "search for linkedin roles available for ai engineer in us or europe that allow international hires from brazil. Try multiple ways to get the answer untill you find the answer"
-    )
+    question = "search for linkedin roles available for ai engineer in us or europe that allow international hires from brazil. Try multiple ways to get the answer untill you find the answer"
 
     # Strong system message with explicit schema instructions
     system_message = f"""

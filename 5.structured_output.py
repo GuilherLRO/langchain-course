@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+
 load_dotenv()
 
 from typing import List
@@ -15,8 +16,10 @@ from langchain_core.runnables import RunnableLambda
 set_debug(True)
 # ---------- Pydantic schema ----------
 
+
 class Source(BaseModel):
     url: str = Field(description="URL of a source used to answer the question")
+
 
 class AgentResponse(BaseModel):
     answer: str = Field(description="Natural language answer to the user's question")
@@ -36,7 +39,6 @@ tavily_tool = TavilySearch(max_results=5)
 tools = [tavily_tool]
 
 
-
 # ---------- Build the agent ----------
 
 agent_executor = create_agent(
@@ -45,7 +47,11 @@ agent_executor = create_agent(
 )
 
 # Create a chain: Agent -> Extract Content -> Parse
-chain = agent_executor | RunnableLambda(lambda x: x["messages"][-1].content) | structured_output_llm
+chain = (
+    agent_executor
+    | RunnableLambda(lambda x: x["messages"][-1].content)
+    | structured_output_llm
+)
 
 
 # ---------- Run & parse ----------
@@ -53,9 +59,7 @@ chain = agent_executor | RunnableLambda(lambda x: x["messages"][-1].content) | s
 if __name__ == "__main__":
     print("Hello from langchain-course!")
 
-    question = (
-        "search for linkedin roles available for ai engineer in us or europe that allow international hires from brazil."
-    )
+    question = "search for linkedin roles available for ai engineer in us or europe that allow international hires from brazil."
 
     # Strong system message with explicit schema instructions
     system_message = f"""You are an assistant """
