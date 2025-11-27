@@ -1,0 +1,85 @@
+from dotenv import load_dotenv
+load_dotenv()
+
+from typing import List
+from pydantic import BaseModel, Field
+
+
+from langchain_ollama import ChatOllama
+from langchain_tavily import TavilySearch
+from langchain.agents import create_agent
+from langchain_core.output_parsers import PydanticOutputParser
+
+from langchain_core.globals import set_debug
+from langchain_core.runnables import RunnableLambda
+
+set_debug(True)
+# ---------- Pydantic schema ----------
+
+class Source(BaseModel):
+    url: str = Field(description="URL of a source used to answer the question")
+
+class AgentResponse(BaseModel):
+    answer: str = Field(description="Natural language answer to the user's question")
+    sources: List[Source] = Field(
+        default_factory=list,
+        description="List of sources used to answer the question",
+    )
+
+
+# ---------- LLM + Tool ----------
+
+llm = ChatOllama(model="llama3.1:8b", temperature=0)
+structured_output_llm = llm.with_structured_output(AgentResponse)
+
+# Tavily tool (langchain-tavily)
+tavily_tool = TavilySearch(max_results=5)
+tools = [tavily_tool]
+
+
+
+# ---------- Build the agent ----------
+
+agent_executor = create_agent(
+    model=llm,
+    tools=tools,
+)
+
+# Create a chain: Agent -> Extract Content -> Parse
+chain = agent_executor | RunnableLambda(lambda x: x["messages"][-1].content) | structured_output_llm
+
+
+# ---------- Run & parse ----------
+
+if __name__ == "__main__":
+    print("Hello from langchain-course!")
+
+    format_instructions = PydanticOutputParser(pydantic_object=AgentResponse).get_format_instructions()
+    question = (
+        "latest news about Nvidia earnings"
+        "expected output format: "
+        f"{format_instructions}"
+        "the sources must be the links for every role you find"
+    )
+
+    # Strong system message with explicit schema instructions
+    system_message = f"""You are an assistant """
+
+    # Call the chain
+    parsed_result = chain.invoke(
+        {
+            "messages": [
+                ("system", system_message),
+                ("human", question),
+            ]
+        },
+        # optional verbose config if you want to see tool calls
+        config={"configurable": {"verbose": True}},
+    )
+
+    print("\nParsed as AgentResponse:\n", parsed_result)
+
+    print("\nAnswer:\n", parsed_result.answer)
+    print("\nSources:")
+    for s in parsed_result.sources:
+        print("  -", s.url)
