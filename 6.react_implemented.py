@@ -11,6 +11,7 @@ def get_text_length(text: str) -> int:
     """Returns the length of a text by characters"""
     print(f"Getting text length for: {text}")
     text = text.strip("'\n'").strip('"')
+    
     return len(text)
 
 
