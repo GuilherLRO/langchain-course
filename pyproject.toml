@@ -24,6 +24,7 @@ dependencies = [
     "openai>=2.7.2",
     "pypdf>=6.4.0",
     "python-dotenv>=1.2.1",
+    "rich>=13.0.0",
     "schemas>=0.7.1",
     "tavily-python>=0.7.13",
 ]
